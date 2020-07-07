@@ -68,7 +68,7 @@ class UI {
                    class="product-img"/>
                    <button class="bag-btn" data-id="${product.id}">
                        <i class="fas fa-shopping-cart"></i>
-                       add to bag
+                       add to cart
                    </button>
                </div>
                <h3>${product.title}</h3>
@@ -176,6 +176,35 @@ class UI {
         cartOverlay.classList.remove('transparentBcg');
     }
 
+    cartLogic() {
+        clearCartBtn.addEventListener('click', () =>
+        this.clearCart());
+    }
+
+    clearCart() {
+        let cartItems = cart.map(item => item.id);     // will give cart item ids
+        // console.log(cartItems);
+        cartItems.forEach(id => this.removeItem(id));
+        while(cartContent.children.length > 0) {
+            cartContent.removeChild(cartContent.children[0]);   
+        }
+        this.hideCart();
+    }
+
+    removeItem(id) {
+        console.log('before',cart);
+        cart = cart.filter(item => item.id !== id);
+        console.log('cart value from removeItem',cart);
+        this.setCartValues(cart);
+        Storage.saveCart(cart);
+        let button = this.getSingleButton(id);
+        button.disabled = false;
+        button.innerHTML = `<i class="fas fa-shopping-cart"></i>add to cart`;
+    }
+    getSingleButton(id) {
+        return buttonsDOM.find(button =>  button.dataset.id === id);
+    }
+
 }
 
 //local Storage
@@ -209,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Storage.saveProduct(products);
     }).then(() => {
         ui.getBagButton();
+        ui.cartLogic();
     });
 })
 
