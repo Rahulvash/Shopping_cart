@@ -177,8 +177,46 @@ class UI {
     }
 
     cartLogic() {
-        clearCartBtn.addEventListener('click', () =>
-        this.clearCart());
+        clearCartBtn.addEventListener('click', () => {
+        this.clearCart();
+    });
+
+    cartContent.addEventListener('click' ,event => {
+        // console.log(event.target);
+        if(event.target.classList.contains('remove-item')) {
+           let removeItem = event.target;
+           let id = removeItem.dataset.id;
+        //    console.log(removeItem.parentElement.parentElement);
+           cartContent.removeChild(removeItem.parentElement.parentElement);
+           this.removeItem(id);
+        }
+        else if(event.target.classList.contains('fa-chevron-up')) {
+            let addAmount = event.target;
+            let id = addAmount.dataset.id;
+            let tempItem = cart.find(item => item.id === id);
+            tempItem.amount = tempItem.amount + 1;
+            console.log(cart)
+            Storage.saveCart(cart);
+            this.setCartValues(cart);
+            addAmount.nextElementSibling.innerHTML = tempItem.amount;
+        }
+        else if(event.target.classList.contains('fa-chevron-down')) {
+            let subAmount = event.target;
+            let id = subAmount.dataset.id;
+            let tempItem = cart.find(item => item.id === id);
+            tempItem.amount = tempItem.amount - 1;
+            if(tempItem.amount > 0) {
+                Storage.saveCart(cart);
+                this.setCartValues(cart);
+                subAmount.previousElementSibling.innerHTML = tempItem.amount;
+            }
+            else {
+                cartContent.removeChild(subAmount.parentElement.parentElement);
+                this.removeItem(id);
+            }
+        }
+    });
+
     }
 
     clearCart() {
@@ -192,9 +230,9 @@ class UI {
     }
 
     removeItem(id) {
-        console.log('before',cart);
+        // console.log('before',cart);
         cart = cart.filter(item => item.id !== id);
-        console.log('cart value from removeItem',cart);
+        // console.log('cart value from removeItem',cart);
         this.setCartValues(cart);
         Storage.saveCart(cart);
         let button = this.getSingleButton(id);
